@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text = "${Headtitle}">Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+</head>
+
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>To-Do Form</h2>
+            <div class="alert alert-success" th:if="${successmessage}">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong th:text="${successmessage}"></strong>
+            </div>
+            <div class="alert alert-warning" th:if="${errormessage}">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                <strong th:text="${errormessage}"></strong>
+            </div>
+            <form action="#" th:action="@{${isAdd}? '/create' : '/update' }" th:object="${todo}" method="post">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="title" placeholder="Title" th:field="*{title}">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="description" placeholder="Description" th:field="*{description}">
+                </div>
+                <div class="form-group">
+                    <label for="status">Status:</label>
+                    <select class="form-control" id="status" th:field="*{status}">
+                        <option value="pending">Pending</option>
+                        <option value="inprogress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <input type="hidden" class="form-control" th:field = "*{id}">
+<!--                <input type="hidden"  class="form-control" th:field = "*{createdAt}">-->
+                <button type="submit" class="btn btn-primary" th:text="${isAdd}? 'Create' : 'Update'">Submit</button>
+            </form>
+        </div>
+
+
+        <div class="col-md-12" style="margin-top: 50px">
+            <h2>TO-DOs</h2>
+<!--            <div class="alert alert-dark alert-dismissible" th:if="${}">-->
+<!--                <button type="button" class="close" data-dismiss="alert">&times;</button>-->
+<!--                <strong th:text="${}">Dark!</strong>-->
+<!--            </div>-->
+            <br>
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#home">All To-Dos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#menu1">Pending To-Dos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#menu2">In Progress To-Dos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#menu3">Completed To-Dos</a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div id="home" class="container tab-pane active"><br>
+                    <!-- paste here -->
+
+                    <table id="todotable" class="table table-bordered table-stripped" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+<!--                            <th>Updated At At</th>-->
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="todo: ${todos}">
+                            <td th:text="${todo.title}"></td>
+                            <td th:text="${todo.description}"></td>
+                            <td th:text="${todo.status}"></td>
+                            <td th:text="${todo.createdAt}"></td>
+<!--                            <td th:text="${todo.updatedAt}"></td>-->
+                            <td>
+                                <a th:href="@{'/view/' + ${todo.id}}" type="button" class="btn btn-outline-info btn-sm" >Info</a>
+                                <a th:href="@{'/getTodo/' +${todo.id}}"><i class="fa fa-edit" style="font-size: 20px"></i></a>
+                                <a th:href="@{'/deleteTodo/' +${todo.id}}"  href="javascript:void(0)" class="confirm-delete" th:attr="data-id=${todo.id}, data-name=${todo.title}">
+                                    <i class="fa fa-trash" style="font-size: 20px; color: red;"></i>
+                                </a>
+
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="menu1" class="container tab-pane fade"><br>
+                    <table id="todotablepending" class="table table-bordered table-stripped" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+<!--                            <th>Updated At At</th>-->
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${todo.status} == 'pending'" th:each="todo: ${todos}">
+                            <td th:text="${todo.title}"></td>
+                            <td th:text="${todo.description}"></td>
+                            <td th:text="${todo.status}"></td>
+                            <td th:text="${todo.createdAt}"></td>
+<!--                            <td th:text="${todo.updatedAt}"></td>-->
+                            <td>
+                                <a th:href="@{'/getTodo/' +${todo.id}}"><i class="fa fa-edit" style="font-size: 20px"></i></a>
+                                <a th:href="@{'/deleteTodo/' +${todo.id}}"  href="javascript:void(0)" class="confirm-delete" th:attr="data-id=${todo.id}, data-name=${todo.title}">
+                                    <i class="fa fa-trash" style="font-size: 20px; color: red;"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="menu2" class="container tab-pane fade"><br>
+                    <table id="todotableinprogress" class="table table-bordered table-stripped" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+<!--                            <th>Updated At At</th>-->
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${todo.status} == 'inprogress'" th:each="todo: ${todos}">
+                            <td th:text="${todo.title}"></td>
+                            <td th:text="${todo.description}"></td>
+                            <td th:text="${todo.status}"></td>
+                            <td th:text="${todo.createdAt}"></td>
+<!--                            <td th:text="${todo.updatedAt}"></td>-->
+                            <td>
+                                <a th:href="@{'/getTodo/' +${todo.id}}"><i class="fa fa-edit" style="font-size: 20px"></i></a>
+                                <a th:href="@{'/deleteTodo/' +${todo.id}}"  href="javascript:void(0)" class="confirm-delete" th:attr="data-id=${todo.id}, data-name=${todo.title}">
+                                    <i class="fa fa-trash" style="font-size: 20px; color: red;"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="menu3" class="container tab-pane fade"><br>
+                    <table id="todotablecompleted" class="table table-bordered table-stripped" style="width: 100%">
+                        <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>Updated At At</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${todo.status} == 'completed'" th:each="todo: ${todos}">
+                            <td th:text="${todo.title}"></td>
+                            <td th:text="${todo.description}"></td>
+                            <td th:text="${todo.status}"></td>
+                            <td th:text="${todo.createdAt}"></td>
+                            <td th:text="${todo.updatedAt}"></td>
+                            <td>
+                                <a th:href="@{'/getTodo/' +${todo.id}}"><i class="fa fa-edit" style="font-size: 20px"></i></a>
+                                <a th:href="@{'/deleteTodo/' +${todo.id}}"  href="javascript:void(0)" class="confirm-delete" th:attr="data-id=${todo.id}, data-name=${todo.title}">
+                                    <i class="fa fa-trash" style="font-size: 20px; color: red;"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+
+
+
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+</body>
+</html>
